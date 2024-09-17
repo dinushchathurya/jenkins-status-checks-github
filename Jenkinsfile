@@ -5,13 +5,13 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Notify GitHub that the build is pending
+                    // Send 'pending' status to GitHub
                     githubNotify context: 'Build', status: 'PENDING'
                 }
                 // Build step
-                sh 'make build'
+                sh 'make build'  // Replace with your build command
                 script {
-                    // Notify GitHub that the build was successful
+                    // Send success status to GitHub
                     githubNotify context: 'Build', status: 'SUCCESS'
                 }
             }
@@ -20,13 +20,13 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Notify GitHub that the tests are pending
+                    // Send 'pending' status to GitHub
                     githubNotify context: 'Test', status: 'PENDING'
                 }
                 // Test step
-                sh 'make test'
+                sh 'make test'  // Replace with your test command
                 script {
-                    // Notify GitHub that the tests were successful
+                    // Send success status to GitHub
                     githubNotify context: 'Test', status: 'SUCCESS'
                 }
             }
@@ -36,7 +36,7 @@ pipeline {
     post {
         failure {
             script {
-                // Notify GitHub of failure
+                // Notify GitHub of failure in any stage
                 githubNotify context: 'Build', status: 'FAILURE'
             }
         }
