@@ -1,70 +1,30 @@
 pipeline {
-
-    agent {
-        node {
-            label 'master'
-        }
-    }
-
-    options {
-        buildDiscarder logRotator( 
-                    daysToKeepStr: '16', 
-                    numToKeepStr: '10'
-            )
-    }
-
+    agent any
     stages {
-        
-        stage('Cleanup Workspace') {
+        stage('Build') {
             steps {
-                cleanWs()
-                sh """
-                echo "Cleaned Up Workspace For Project"
-                """
+                script {
+                    // Send 'pending' status
+                    githubNotify context: 'Build', status: 'PENDING'
+                }
+                // Your build step here
+                script {
+                    githubNotify context: 'Build', status: 'SUCCESS'
+                }
             }
         }
-
-        stage('Code Checkout') {
+        stage('Test') {
             steps {
-                checkout([
-                    $class: 'GitSCM', 
-                    branches: [[name: '*/main']], 
-                    userRemoteConfigs: [[url: 'https://github.com/dinushchathurya/jenkins-status-checks-github.git']]
-                ])
+                script {
+                    githubNotify context: 'Test', status: 'PENDING'
+                }
+                // Your test step here
+                script {
+                    githubNotify context: 'Test', status: 'SUCCESS'
+                }
             }
         }
-
-        stage(' Unit Testing') {
-            steps {
-                sh """
-                echo "Running Unit Tests"
-                """
-            }
-        }
-
-        stage('Code Analysis') {
-            steps {
-                sh """
-                echo "Running Code Analysis"
-                """
-            }
-        }
-
-        stage('Build Deploy Code') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                sh """
-                echo "Building Artifact"
-                """
-
-                sh """
-                echo "Deploying Code"
-                """
-            }
-        }
-
-    }   
+    }
 }
+
 
