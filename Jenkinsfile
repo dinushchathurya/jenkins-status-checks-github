@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the repository code
+                // Checkout the repository
                 checkout scm
             }
         }
@@ -21,35 +21,14 @@ pipeline {
                 }
             }
         }
-
-        stage('Build') {
-            steps {
-                echo 'Building the application...'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'Running unit tests...'
-            }
-        }
-        
-        stage('Code Quality') {
-            steps {
-                echo 'Checking code quality...'
-            }
-        }
     }
     
     post {
         success {
-            // Notifies GitHub on successful build
-            githubNotify context: 'Jenkins Status Checker', status: 'SUCCESS', description: 'Build and tests passed.'
+            echo 'Pipeline completed successfully.'
         }
         failure {
-            // Notifies GitHub on failure
-            githubNotify context: 'Jenkins Status Checker', status: 'FAILURE', description: 'Build or tests failed.'
+            echo 'Pipeline failed.'
         }
     }
 }
-\
