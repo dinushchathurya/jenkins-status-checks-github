@@ -19,10 +19,10 @@ pipeline {
     }
     post {
         success {
-            githubChecks status: 'SUCCESS', name: 'My App Pipeline'
+            githubChecks status: 'SUCCESS', name: 'Jenkins Status Checker'
         }
         failure {
-            githubChecks status: 'FAILURE', name: 'My App Pipeline'
+            githubChecks status: 'FAILURE', name: 'Jenkins Status Checker'
         }
     }
 }
