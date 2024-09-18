@@ -9,6 +9,19 @@ pipeline {
             }
         }
         
+        stage('Check for helloworld.txt') {
+            steps {
+                script {
+                    // Check if the helloworld.txt file exists
+                    if (fileExists('helloworld.txt')) {
+                        echo 'helloworld.txt exists!'
+                    } else {
+                        error 'helloworld.txt not found!'
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 echo 'Building the application...'
@@ -37,11 +50,11 @@ pipeline {
     post {
         success {
             // Notifies GitHub on successful build
-            githubNotify context: 'Jenkins CI', status: 'SUCCESS', description: 'Build and tests passed.'
+            githubNotify context: 'Jenkins Status Checker', status: 'SUCCESS', description: 'Build and tests passed.'
         }
         failure {
             // Notifies GitHub on failure
-            githubNotify context: 'Jenkins CI', status: 'FAILURE', description: 'Build or tests failed.'
+            githubNotify context: 'Jenkins Status Checker', status: 'FAILURE', description: 'Build or tests failed.'
         }
     }
 }
