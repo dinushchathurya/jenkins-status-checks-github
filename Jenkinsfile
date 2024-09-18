@@ -1,25 +1,28 @@
 pipeline {
     agent any
+    triggers {
+        githubPush()
+    }
     stages {
         stage('Build') {
             steps {
                 echo 'Building...'
-                // Your build steps here
+                // Add build steps here
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
-                // Your test steps here
+                // Add test steps here
             }
         }
     }
     post {
         success {
-            echo 'PR passed!'
+            githubChecks status: 'SUCCESS', name: 'Jenkins Status Checker'
         }
         failure {
-            echo 'PR failed!'
+            githubChecks status: 'FAILURE', name: 'Jenkins Status Checker'
         }
     }
 }
