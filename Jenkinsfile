@@ -1,62 +1,59 @@
 pipeline {
     agent any
-    
+
+    environment {
+        // Define environment variables
+        GITHUB_REPO = 'dinushchathurya/jenkins-status-checks-github'
+        GITHUB_CREDENTIALS_ID = 'github-app-secret'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the repository code
-                checkout scm
-            }
-        }
-        
-        stage('Check for helloworld.txt') {
-            steps {
-                script {
-                    // Check if the helloworld.txt file exists
-                    if (fileExists('helloworld.txt')) {
-                        echo 'helloworld.txt exists!'
-                    } else {
-                        error 'helloworld.txt not found!'
-                    }
-                }
+                // Checkout code from GitHub
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/dinushchathurya/jenkins-status-checks-github.git']]
+                ])
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building the application...'
-                // Insert build steps here (e.g., npm build, mvn build, etc.)
-                // sh 'mvn clean install'  (for Maven projects)
+                // Add your build steps here
+                echo 'Building...'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running unit tests...'
-                // Insert your testing command here (e.g., npm test, mvn test, etc.)
-                // sh 'mvn test' (for Maven projects)
-            }
-        }
-        
-        stage('Code Quality') {
-            steps {
-                echo 'Checking code quality...'
-                // Insert linting or code analysis commands here
-                // sh 'npm run lint' (for Node.js projects)
+                // Add your test steps here
+                echo 'Testing...'
             }
         }
     }
-    
+
     post {
         success {
-            // Notifies GitHub on successful build
-            githubNotify context: 'GitHub Status Checker', status: 'SUCCESS', description: 'Build and tests passed.'
+            // Notify GitHub on success
+            githubNotify(
+                context: 'continuous-integration/jenkins',
+                status: 'SUCCESS',
+                repo: "${env.GITHUB_REPO}",
+                credentialsId: "${env.GITHUB_CREDENTIALS_ID}",
+                sha: sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+            )
         }
+
         failure {
-            // Notifies GitHub on failure
-            githubNotify context: 'GitHub Status Checker', status: 'FAILURE', description: 'Build or tests failed.'
+            // Notify GitHub on failure
+            githubNotify(
+                context: 'continuous-integration/jenkins',
+                status: 'FAILURE',
+                repo: "${env.GITHUB_REPO}",
+                credentialsId: "${env.GITHUB_CREDENTIALS_ID}",
+                sha: sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+            )
         }
     }
 }
-
-
